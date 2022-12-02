@@ -18,23 +18,23 @@ def main():
     Prints the start and name of the next 10 events on the user's calendar.
     """
     event = {
-        'summary': 'Google I/O 2015',
+        'summary': 'test3',
         'location': '800 Howard St., San Francisco, CA 94103',
         'description': 'A chance to hear more about Google\'s developer products.',
         'start': {
-            'dateTime': '2015-01-15T09:00:00-07:00',
-            'timeZone': 'America/Los_Angeles',
+            'dateTime': '2022-12-03T16:16:00',
+            'timeZone': 'Asia/Seoul',
         },
         'end': {
-            'dateTime': '2015-01-15T17:00:00-07:00',
-            'timeZone': 'America/Los_Angeles',
+            'dateTime': '2022-12-03T16:16:01',
+            'timeZone': 'Asia/Seoul',
         },
-        'recurrence': [
-            'RRULE:FREQ=DAILY;COUNT=2'
-        ],
+        # 'recurrence': [
+        #     'RRULE:FREQ=DAILY;COUNT=2'
+        # ],
         'attendees': [
-            {'email': 'lpage@example.com'},
-            {'email': 'sbrin@example.com'},
+            {'email': 'gyen530@bigvalue.co.kr'},
+            {'email': 'showjihyun@bigvalue.co.kr'},
         ],
         'reminders': {
             'useDefault': False,
