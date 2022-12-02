@@ -2,6 +2,11 @@ from __future__ import print_function
 
 import datetime
 import os.path
+import pandas as pd
+
+import json
+
+from openpyxl import Workbook
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -13,20 +18,17 @@ from googleapiclient.errors import HttpError
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 
-def main():
-    """Shows basic usage of the Google Calendar API.
-    Prints the start and name of the next 10 events on the user's calendar.
-    """
-    event = {
-        'summary': 'test3',
+def createEvent(summary, startDate, endDate, description):
+    return {
+        'summary': summary,
         'location': '800 Howard St., San Francisco, CA 94103',
-        'description': 'A chance to hear more about Google\'s developer products.',
+        'description': description,
         'start': {
-            'dateTime': '2022-12-03T16:16:00',
+            'dateTime': startDate,
             'timeZone': 'Asia/Seoul',
         },
         'end': {
-            'dateTime': '2022-12-03T16:16:01',
+            'dateTime': endDate,
             'timeZone': 'Asia/Seoul',
         },
         # 'recurrence': [
@@ -44,6 +46,38 @@ def main():
             ],
         },
     }
+
+def main():
+    """Shows basic usage of the Google Calendar API.
+    Prints the start and name of the next 10 events on the user's calendar.
+    """
+    # event = {
+    #     'summary': 'test3',
+    #     'location': '800 Howard St., San Francisco, CA 94103',
+    #     'description': 'A chance to hear more about Google\'s developer products.',
+    #     'start': {
+    #         'dateTime': '2022-12-03T16:16:00',
+    #         'timeZone': 'Asia/Seoul',
+    #     },
+    #     'end': {
+    #         'dateTime': '2022-12-03T16:16:01',
+    #         'timeZone': 'Asia/Seoul',
+    #     },
+    #     # 'recurrence': [
+    #     #     'RRULE:FREQ=DAILY;COUNT=2'
+    #     # ],
+    #     'attendees': [
+    #         {'email': 'gyen530@bigvalue.co.kr'},
+    #         {'email': 'showjihyun@bigvalue.co.kr'},
+    #     ],
+    #     'reminders': {
+    #         'useDefault': False,
+    #         'overrides': [
+    #             {'method': 'email', 'minutes': 24 * 60},
+    #             {'method': 'popup', 'minutes': 10},
+    #         ],
+    #     },
+    # }
 
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
@@ -74,7 +108,42 @@ def main():
         #                                       orderBy='startTime').execute()
         # events = events_result.get('items', [])
 
-        event = service.events().insert(calendarId='primary', body=event).execute()
+        #엑셀 읽어서
+
+        #wb = Workbook()
+
+        directory = os.getcwd()
+
+        wb = pd.read_excel(directory + '\\gongsi.xlsx', usecols = [0, 1, 3, 6])
+
+        for idx, row in wb.iterrows():
+            if idx > 0:
+                startDate = row['Start Date']
+                startDate = startDate.strftime("%Y-%m-%dT00:00:00")
+                endDate = row['End Date']
+                description = row['Description']
+                subject = row['Subject'] + ' [' + description + ']'
+                #date = '2022-12-02T00:00:00'
+                if pd.isna(endDate):
+                    #endDate = startDate
+                    event2 = createEvent(subject, startDate, startDate, description)
+                    event2 = service.events().insert(calendarId='primary', body=event2).execute()
+                else:
+                    endDate = endDate.strftime("%Y-%m-%dT00:00:00")
+                    event2 = createEvent(subject + '시작일', startDate, startDate, description)
+                    event2 = service.events().insert(calendarId='primary', body=event2).execute()
+                    event2 = createEvent(subject + '종료일', endDate, endDate, description)
+                    event2 = service.events().insert(calendarId='primary', body=event2).execute()
+
+        #print(wb)
+
+        #wb = load_workbook(filename='gongsi.xlsx')
+        #summary = ws3['AA10'].value
+
+        #event2 = createEvent(summary, '2022-12-03T16:16:00')
+
+
+        #event = service.events().insert(calendarId='primary', body=event).execute()
 
         # if not events:
         #     print('No upcoming events found.')
